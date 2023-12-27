@@ -1,0 +1,36 @@
+{
+    "name": "ratipriya/sngine-faq-module",
+    "description": "Multilingual FAQ Module for Sngine Social Network Platform",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ratipriyakundu",
+            "email": "ratipriyakundu6@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Ratipriya\\SngineFAQ\\": "src/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5",
+        "doctrine/coding-standard": "^12.0",
+        "slevomat/coding-standard": "^8.14"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ratipriya\\SngineFAQ\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "./vendor/bin/phpunit --coverage-html=test-report",
+        "linter": "./vendor/bin/phpcs --standard=PSR12 src"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}
