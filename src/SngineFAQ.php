@@ -70,6 +70,52 @@ final class SngineFAQ
                 );
             }
 
+            //Check if import required for delete.php file
+            if (
+                file_exists($this->rootDirectory . '/includes/ajax/admin/delete.php')
+            ) {
+                if (
+                    filesize($this->rootDirectory . '/includes/ajax/admin/delete.php')
+                    !== filesize(dirname(__DIR__) . '/templates/delete.php')
+                    || md5_file($this->rootDirectory . '/includes/ajax/admin/delete.php')
+                    !== md5_file(dirname(__DIR__) . '/templates/delete.php')
+                ) {
+                    copy(
+                        dirname(__DIR__) . '/templates/delete.php',
+                        $this->rootDirectory . '/includes/ajax/admin/delete.php'
+                    );
+                }
+            } else {
+                touch($this->rootDirectory . '/includes/ajax/admin/delete.php');
+                copy(
+                    dirname(__DIR__) . '/templates/delete.php',
+                    $this->rootDirectory . '/includes/ajax/admin/delete.php'
+                );
+            }
+
+            //Check if import required for faq.php file
+            if (
+                file_exists($this->rootDirectory . '/includes/ajax/admin/faq.php')
+            ) {
+                if (
+                    filesize($this->rootDirectory . '/includes/ajax/admin/faq.php')
+                    !== filesize(dirname(__DIR__) . '/templates/faq.php')
+                    || md5_file($this->rootDirectory . '/includes/ajax/admin/faq.php')
+                    !== md5_file(dirname(__DIR__) . '/templates/faq.php')
+                ) {
+                    copy(
+                        dirname(__DIR__) . '/templates/faq.php',
+                        $this->rootDirectory . '/includes/ajax/admin/faq.php'
+                    );
+                }
+            } else {
+                touch($this->rootDirectory . '/includes/ajax/admin/faq.php');
+                copy(
+                    dirname(__DIR__) . '/templates/faq.php',
+                    $this->rootDirectory . '/includes/ajax/admin/faq.php'
+                );
+            }
+
             //Check 'faqs' table exists in our database or need to import
             $sql = "SHOW TABLES LIKE 'faqs'";
             $query = $this->db->query($sql);
@@ -80,7 +126,7 @@ final class SngineFAQ
                     `language_code` varchar(255) NOT NULL,
                     `page_title` varchar(255) NOT NULL,
                     `page_content` longtext NOT NULL,
-                    `enabled` enum('0','1') NOT NULL DEFAULT '1'
+                    `faq_enabled` enum('0','1') NOT NULL DEFAULT '1'
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci";
                 $this->db->query($faq_table_sql);
                 $faq_table_sql = "ALTER TABLE `faqs`
@@ -88,8 +134,12 @@ final class SngineFAQ
                 ADD KEY `faqs_foreign_language_id` (`language_id`)";
                 $this->db->query($faq_table_sql);
                 $faq_table_sql = "ALTER TABLE `faqs`
+                MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT";
+                $this->db->query($faq_table_sql);
+                $faq_table_sql = "ALTER TABLE `faqs`
                 ADD CONSTRAINT `faqs_foreign_language_id`
-                FOREIGN KEY (`language_id`) REFERENCES `system_languages` (`language_id`)";
+                FOREIGN KEY (`language_id`) REFERENCES `system_languages` (`language_id`)
+                ON DELETE CASCADE";
                 $this->db->query($faq_table_sql);
             }
 
@@ -111,7 +161,11 @@ final class SngineFAQ
                 ADD KEY `faq-items_foreign_faq_id` (`faq_id`)";
                 $this->db->query($faq_item_table_sql);
                 $faq_item_table_sql = "ALTER TABLE `faq-items`
-                ADD CONSTRAINT `faq-items_foreign_faq_id` FOREIGN KEY (`faq_id`) REFERENCES `faqs` (`id`)";
+                MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT";
+                $this->db->query($faq_item_table_sql);
+                $faq_item_table_sql = "ALTER TABLE `faq-items`
+                ADD CONSTRAINT `faq-items_foreign_faq_id` FOREIGN KEY (`faq_id`) REFERENCES `faqs` (`id`)
+                ON DELETE CASCADE";
                 $this->db->query($faq_item_table_sql);
             }
         }

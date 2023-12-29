@@ -3608,7 +3608,7 @@ try {
                             if ($faq_created->num_rows > 0) {
                                 $row['faq_exists'] = true;
                                 $faq_row = $faq_created->fetch_array();
-                                $row['faq_enabled'] = $faq_row['enabled'];
+                                $row['faq_enabled'] = $faq_row['faq_enabled'];
                             }
                             $row['flag'] = get_picture($row['flag'], 'flag');
                             $rows[] = $row;
@@ -3626,17 +3626,24 @@ try {
                     }
 
                     // get data
-                    $get_data = $db->query(sprintf("SELECT * FROM static_pages WHERE page_id = %s", secure($_GET['id'], 'int'))) or _error('SQL_ERROR');
+                    $get_data = $db->query(sprintf("SELECT * FROM faqs WHERE language_id = %s", secure($_GET['id'], 'int'))) or _error('SQL_ERROR');
                     if ($get_data->num_rows == 0) {
                         _error(404);
                     }
                     $data = $get_data->fetch_assoc();
-
                     // assign variables
+                    
+
+                    $faq_items = $db->query(sprintf("SELECT * FROM `faq-items` WHERE faq_id = %s", secure($data['id'], 'int'))) or _error('SQL_ERROR');
+                    $items = [];
+                    while ($faq_item = $faq_items->fetch_assoc()) {
+                        $items[] = $faq_item;
+                    }
+                    $data['items'] = $items;
                     $smarty->assign('data', $data);
 
                     // page header
-                    page_header($control_panel['title'] . " &rsaquo; " . __("FAQ Pages") . " &rsaquo; " . $data['page_title']);
+                    page_header($control_panel['title'] . " &rsaquo; " . __("FAQ Pages") . " &rsaquo; " .  __("Edit FAQ"));
                     break;
 
                 case 'add':
@@ -3646,11 +3653,17 @@ try {
                         _error(404);
                     }
 
+                    $faq_exists = $db->query(sprintf("SELECT * FROM faqs WHERE language_id = %s", secure($_GET['id'], 'int'))) or _error('SQL_ERROR');
+                    if ($faq_exists->num_rows > 0) {
+                        _error(404);
+                    }
+
                     // get data
                     $get_data = $db->query(sprintf("SELECT * FROM system_languages WHERE language_id = %s", secure($_GET['id'], 'int'))) or _error('SQL_ERROR');
                     if ($get_data->num_rows == 0) {
                         _error(404);
                     }
+
                     $data = $get_data->fetch_assoc();
 
                     // assign variables
